@@ -36,6 +36,15 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     // ========================
     // Routes
     // ========================
+        app.get("/", (req, res) => {
+          db.collection("quotes")
+            .find()
+            .toArray()
+            .then((quotes) => {
+              res.render("index.html");
+            })
+            .catch(/* ... */);
+        });
 
     app.post("/sale", (req, res) => {
       saleCollection
