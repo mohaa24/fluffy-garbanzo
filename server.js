@@ -6,8 +6,6 @@ const nodeCron = require("node-cron");
 const axios = require("axios").default;
 const cors = require("cors");
 
-
-
 // ========================
 // MiddleWares
 // ========================
@@ -15,7 +13,6 @@ const cors = require("cors");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(cors());
-
 
 // ========================
 // Configuring DB
@@ -36,24 +33,24 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     // ========================
     // Routes
     // ========================
-        app.get("/", (req, res) => {
-          db.collection("quotes")
-            .find()
-            .toArray()
-            .then((quotes) => {
-              res.render("index.html");
-            })
-            .catch(/* ... */);
-        });
-
-    app.post("/sale", (req, res) => {
-      saleCollection
-        .insertOne({})
-        .then((result) => {
-          console.log(result);
+    app.get("/", (req, res) => {
+      db.collection("quotes")
+        .find()
+        .toArray()
+        .then((quotes) => {
+          res.render("index.html");
         })
-        .catch((error) => console.error(error));
+        .catch(/* ... */);
     });
+
+    // app.post("/sale", (req, res) => {
+    //   saleCollection
+    //     .insertOne({})
+    //     .then((result) => {
+    //       console.log(result);
+    //     })
+    //     .catch((error) => console.error(error));
+    // });
 
     app.get("/sale", (req, res) => {
       db.collection("sale")
@@ -65,7 +62,17 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         .catch(/* ... */);
     });
 
-    app.listen(process.env.PORT || 8888, function () {
+        app.get("/sold", (req, res) => {
+          db.collection("sale")
+            .find()
+            .toArray()
+            .then((results) => {
+              res.send(sold);
+            })
+            .catch(/* ... */);
+        });
+
+    app.listen(process.env.PORT || 3100, function () {
       console.log(`listening on ${3100}`);
     });
   })
@@ -77,15 +84,21 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
 
 const token = "ozyttvptsnkpbvjfhogsvrtojytbptqeljwbyhyp";
 const key = "wljszq3Wsj8omYXJk6Aek9BdMQCE8ecF7aGmK9hI";
-const apiURL =
-  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale";
+const saleApi =
+  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale?sort=modified&pagesize=5000";
+const soldApi =
+  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?sort=modified&pagesize=5000";
+const leaseApi =
+  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale?sort=modified";
 
 let sale = [];
+let sold = [];
+let lease = [];
 
-const requestPropertyData = (lastUpdated = "0") => {
+const requestSalePropertyData = (lastUpdated = "0") => {
   axios({
     method: "get",
-    url: apiURL,
+    url: saleApi,
     headers: {
       Authorization: `Bearer ${token}`,
       "X-Api-Key": key,
@@ -99,7 +112,43 @@ const requestPropertyData = (lastUpdated = "0") => {
     })
     .catch((error) => console.log(error));
 };
-requestPropertyData();
+const requestSoldPropertyData = (lastUpdated = "0") => {
+  axios({
+    method: "get",
+    url: soldApi,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "X-Api-Key": key,
+    },
+  })
+    .then((response) => {
+      sold = {
+        data: response.data,
+        lastUpdated: lastUpdated,
+      };
+    })
+    .catch((error) => console.log(error));
+};
+const requestLeasePropertyData = (lastUpdated = "0") => {
+  axios({
+    method: "get",
+    url: leaseApi,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "X-Api-Key": key,
+    },
+  })
+    .then((response) => {
+      sale = {
+        data: response.data,
+        lastUpdated: lastUpdated,
+      };
+    })
+    .catch((error) => console.log(error));
+};
+requestSalePropertyData();
+requestSoldPropertyData();
+requestLeasePropertyData();
 
 // ========================
 // Valtre API schedule
@@ -118,5 +167,8 @@ const job = nodeCron.schedule("10 * * * * *", function jobYouNeedToExecute() {
 
   let date = new Date().toLocaleString();
   console.log(`Job ran at ${date}`);
-  requestPropertyData(date);
+
+ requestSalePropertyData(date);
+ requestSoldPropertyData(date);
+ requestLeasePropertyData(date);
 });
