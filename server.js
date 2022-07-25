@@ -109,6 +109,7 @@ const requestSalePropertyData = (lastUpdated = "0") => {
         data: response.data,
         lastUpdated: lastUpdated,
       };
+      
     })
     .catch((error) => console.log(error));
 };
@@ -139,7 +140,7 @@ const requestLeasePropertyData = (lastUpdated = "0") => {
     },
   })
     .then((response) => {
-      sale = {
+      lease = {
         data: response.data,
         lastUpdated: lastUpdated,
       };
@@ -167,8 +168,10 @@ const job = nodeCron.schedule("10 * * * * *", function jobYouNeedToExecute() {
 
   let date = new Date().toLocaleString();
   console.log(`Job ran at ${date}`);
+  console.log(sale);
 
  requestSalePropertyData(date);
  requestSoldPropertyData(date);
  requestLeasePropertyData(date);
+ 
 });
