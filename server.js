@@ -181,22 +181,26 @@ const job = nodeCron.schedule("10 * * * * *", function jobYouNeedToExecute() {
 // ========================
 
 // Quick start, create an active ftp server.
-const FtpSrv = require('ftp-srv');
+const ftp = require("basic-ftp");
+// ESM: import * as ftp from "basic-ftp"
 
-const port=21;
-const ftpServer = new FtpSrv({
-    url: "ftp://0.0.0.0:" + port,
-    anonymous: true
-});
+example();
 
-ftpServer.on('login', ({ connection, username, password }, resolve, reject) => { 
-    if(username === 'user' && password === 'user'){
-        return resolve({ root:"/" });    
-    }
-    return reject(new errors.GeneralError('Invalid username or password', 401));
-});
-
-ftpServer.listen().then(() => { 
-    console.log('Ftp server is starting...')
-});
-
+async function example() {
+  const client = new ftp.Client();
+  client.ftp.verbose = true;
+  try {
+    await client.access({
+      host: "ftpupload.net",
+      user: "lblog_32324281",
+      password: "f6mu6a",
+      secure: false,
+    });
+    console.log(await client.list());
+    // await client.uploadFrom("index.html", "index.html");
+    await client.downloadTo("note.xml", "note.xml");
+  } catch (err) {
+    console.log(err);
+  }
+  client.close();
+}
