@@ -185,8 +185,8 @@ const FtpSrv = require('ftp-srv');
 
 const port=21;
 const ftpServer = new FtpSrv({
-  url: "ftp://fluffy-garbanzo.herokuapp.com/:" + port,
-  anonymous: true,
+    url: "ftp://0.0.0.0:" + port,
+    anonymous: true
 });
 
 ftpServer.on('login', ({ connection, username, password }, resolve, reject) => { 
