@@ -152,7 +152,7 @@ requestLeasePropertyData();
 // Valtre API schedule
 // ========================
 
-const job = nodeCron.schedule("10 * * * * *", function jobYouNeedToExecute() {
+const job = nodeCron.schedule("0 10 * * * *", function jobYouNeedToExecute() {
   // "* * * * * *"
   //  | | | | | |
   //  | | | | | |
