@@ -170,6 +170,7 @@ const job = nodeCron.schedule("10 * * * * *", function jobYouNeedToExecute() {
  requestSalePropertyData(date);
  requestSoldPropertyData(date);
  requestLeasePropertyData(date);
+ callFTp();
  
 });
 
@@ -181,9 +182,9 @@ const job = nodeCron.schedule("10 * * * * *", function jobYouNeedToExecute() {
 const ftp = require("basic-ftp");
 // ESM: import * as ftp from "basic-ftp"
 
-example();
 
-async function example() {
+
+async function callFTp() {
   const client = new ftp.Client();
   client.ftp.verbose = true;
   try {
