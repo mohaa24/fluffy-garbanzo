@@ -5,6 +5,8 @@ const MongoClient = require("mongodb").MongoClient;
 const nodeCron = require("node-cron");
 const axios = require("axios").default;
 const cors = require("cors");
+var path = require("path");
+
 
 // ========================
 // MiddleWares
@@ -34,13 +36,8 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     // Routes
     // ========================
     app.get("/", (req, res) => {
-      db.collection("quotes")
-        .find()
-        .toArray()
-        .then((quotes) => {
-          res.render("index.html");
-        })
-        .catch(/* ... */);
+        res.contentType("application/xml");
+        res.sendFile(path.join(__dirname, "data.xml"));
     });
 
     // app.post("/sale", (req, res) => {
@@ -198,7 +195,7 @@ async function example() {
     });
     console.log(await client.list());
     // await client.uploadFrom("index.html", "index.html");
-    await client.downloadTo("note.xml", "note.xml");
+    await client.downloadTo("data.xml", "propertyMe/note.xml");
   } catch (err) {
     console.log(err);
   }
