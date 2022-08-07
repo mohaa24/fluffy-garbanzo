@@ -6,6 +6,7 @@ const nodeCron = require("node-cron");
 const axios = require("axios").default;
 const cors = require("cors");
 var path = require("path");
+var ObjectId = require("mongodb").ObjectID;
 
 
 // ========================
@@ -33,11 +34,11 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     const blogCollection = db.collection("blog");
 
     // ========================
-    // Routes
+    //  Lease Routes
     // ========================
     app.get("/", (req, res) => {
-        res.contentType("application/xml");
-        res.sendFile(path.join(__dirname, "data.xml"));
+      res.contentType("application/xml");
+      res.sendFile(path.join(__dirname, "data.xml"));
     });
 
     // app.post("/sale", (req, res) => {
@@ -49,6 +50,61 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     //     .catch((error) => console.error(error));
     // });
 
+    // ========================
+    // Blog Routes
+    // ========================
+
+    let posts = [
+      {
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies. Sed commodo imperdiet metus vitae molestie. In laoreet rutrum pretium. Aenean a enim ac lacus tincidunt pellentesque ac a tellus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies.",
+        img: "https://kollosche-1bfb7.kxcdn.com/wp-content/uploads/2022/08/165777114369571257-rsd.jpeg",
+        type: "Post",
+        title: "The Best Suburb for Investors.",
+      },
+      {
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies. Sed commodo imperdiet metus vitae molestie. In laoreet rutrum pretium. Aenean a enim ac lacus tincidunt pellentesque ac a tellus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies.",
+        img: "https://kollosche-1bfb7.kxcdn.com/wp-content/uploads/2022/07/Feature-Image-scaled.jpg",
+        type: "Article",
+        title: "The Gold Coast’s Newest Million Dollar Suburbs.",
+      },
+    ];
+
+    app.get("/addPost", (req, res) => {
+      blogCollection
+
+        .insertOne(posts[1])
+        .then((results) => {
+          res.send(results);
+        })
+        .catch(console.log(req.body, "req"));
+    });
+
+       app.get("/getPost", (req, res) => {
+         blogCollection
+           .find({ _id: ObjectId(req.query.id) })
+           .toArray()
+           .then((results) => {
+             res.send(results);
+           })
+           .catch(/* ... */);
+       }); 
+
+    app.get("/posts", (req, res) => {
+      blogCollection
+        .find()
+        .toArray()
+        .then((results) => {
+          res.send(results);
+        })
+        .catch(/* ... */);
+    });
+
+    // ========================
+    // Property Routes
+    // ========================
+
     app.get("/sale", (req, res) => {
       db.collection("sale")
         .find()
@@ -59,15 +115,15 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         .catch(/* ... */);
     });
 
-        app.get("/sold", (req, res) => {
-          db.collection("sale")
-            .find()
-            .toArray()
-            .then((results) => {
-              res.send(sold);
-            })
-            .catch(/* ... */);
-        });
+    app.get("/sold", (req, res) => {
+      db.collection("sale")
+        .find()
+        .toArray()
+        .then((results) => {
+          res.send(sold);
+        })
+        .catch(/* ... */);
+    });
 
     app.listen(process.env.PORT || 3100, function () {
       console.log(`listening on ${3100}`);
@@ -106,7 +162,7 @@ const requestSalePropertyData = (lastUpdated = "0") => {
         data: response.data,
         lastUpdated: lastUpdated,
       };
-      console.log()
+      console.log();
     })
     .catch((error) => console.log(error));
 };
@@ -167,11 +223,10 @@ const job = nodeCron.schedule("0 10 * * * *", function jobYouNeedToExecute() {
   console.log(`Job ran at ${date}`);
   console.log(sale);
 
- requestSalePropertyData(date);
- requestSoldPropertyData(date);
- requestLeasePropertyData(date);
- callFTp();
- 
+  requestSalePropertyData(date);
+  requestSoldPropertyData(date);
+  requestLeasePropertyData(date);
+  callFTp();
 });
 
 // ========================
@@ -180,9 +235,8 @@ const job = nodeCron.schedule("0 10 * * * *", function jobYouNeedToExecute() {
 
 // Quick start, create an active ftp server.
 const ftp = require("basic-ftp");
+const { post } = require("request");
 // ESM: import * as ftp from "basic-ftp"
-
-
 
 async function callFTp() {
   const client = new ftp.Client();
