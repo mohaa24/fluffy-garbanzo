@@ -76,7 +76,7 @@ app.use(cors());
         });
 
             app.get("/sold_xml", (req, res) => {
-              res.send(soldXML);
+              res.send({soldXML});
             });
 
     app.listen(process.env.PORT || 3100, function () {
