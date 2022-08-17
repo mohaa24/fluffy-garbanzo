@@ -9,13 +9,62 @@ var path = require("path");
 var ObjectId = require("mongodb").ObjectID;
 
 
+
+
+
 // ========================
 // MiddleWares
 // ========================
 // Make sure you place body-parser before your CRUD handlers!
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.set("view engine", "ejs");
 app.use(cors());
+
+
+
+    // ========================
+    // Property Routes
+    // ========================
+
+      //xml data
+   var fs = require("fs"),
+     xml2js = require("xml2js");
+     let leaseXML = [];
+
+   var parser = new xml2js.Parser();
+   fs.readFile(__dirname + "/ftp/data.xml", function (err, data) {
+     parser.parseString(data, function (err, result) {
+      //  console.dir(result);
+      //  console.log("Done",'xml');
+      leaseXML = result;
+     });
+   });
+
+    app.get("/sale", (req, res) => {
+
+          res.send(sale);
+      
+    });
+
+    app.get("/sold", (req, res) => {
+    
+          res.send(sold);
+     
+       
+    });
+
+        app.get("/lease", (req, res) => {
+    
+              res.send(leaseXML);
+          
+        });
+
+    app.listen(process.env.PORT || 3100, function () {
+      console.log(`listening on ${3100}`);
+    });
+
+
+
 
 // ========================
 // Configuring DB
@@ -36,19 +85,8 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     // ========================
     //  Lease Routes
     // ========================
-    app.get("/", (req, res) => {
-      res.contentType("application/xml");
-      res.sendFile(path.join(__dirname, "data.xml"));
-    });
+  
 
-    // app.post("/sale", (req, res) => {
-    //   saleCollection
-    //     .insertOne({})
-    //     .then((result) => {
-    //       console.log(result);
-    //     })
-    //     .catch((error) => console.error(error));
-    // });
 
     // ========================
     // Blog Routes
@@ -71,25 +109,26 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
       },
     ];
 
-    app.get("/addPost", (req, res) => {
-      blogCollection
-
-        .insertOne(posts[1])
-        .then((results) => {
-          res.send(results);
-        })
-        .catch(console.log(req.body, "req"));
+    app.post("/addPost", (req, res) => {
+      blogCollection.insertOne(req.body);
+      res.send("200");
     });
 
-       app.get("/getPost", (req, res) => {
-         blogCollection
-           .find({ _id: ObjectId(req.query.id) })
-           .toArray()
-           .then((results) => {
-             res.send(results);
-           })
-           .catch(/* ... */);
-       }); 
+    app.delete("/removePost", (req, res) => {
+      blogCollection.findOneAndDelete({ _id: ObjectId(req.body.id) });
+      res.send("200");
+    });
+
+    app.get("/getPost", (req, res) => {
+      blogCollection
+        .find({ _id: ObjectId(req.query.id) })
+        .toArray()
+        .then((results) => {
+          console.log(results);
+          res.send(results);
+        })
+        .catch(/* ... */);
+    });
 
     app.get("/posts", (req, res) => {
       blogCollection
@@ -101,33 +140,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         .catch(/* ... */);
     });
 
-    // ========================
-    // Property Routes
-    // ========================
-
-    app.get("/sale", (req, res) => {
-      db.collection("sale")
-        .find()
-        .toArray()
-        .then((results) => {
-          res.send(sale);
-        })
-        .catch(/* ... */);
-    });
-
-    app.get("/sold", (req, res) => {
-      db.collection("sale")
-        .find()
-        .toArray()
-        .then((results) => {
-          res.send(sold);
-        })
-        .catch(/* ... */);
-    });
-
-    app.listen(process.env.PORT || 3100, function () {
-      console.log(`listening on ${3100}`);
-    });
   })
   .catch((error) => console.error(error));
 
@@ -147,6 +159,8 @@ const leaseApi =
 let sale = [];
 let sold = [];
 let lease = [];
+
+
 
 const requestSalePropertyData = (lastUpdated = "0") => {
   axios({
@@ -250,9 +264,14 @@ async function callFTp() {
     });
     console.log(await client.list());
     // await client.uploadFrom("index.html", "index.html");
-    await client.downloadTo("data.xml", "propertyMe/note.xml");
+    await client.downloadTo(
+      "ftp/data.xml",
+      "inspectre_IRE-AntonZhouk_202208152212455450772.xml"
+    );
   } catch (err) {
     console.log(err);
   }
   client.close();
 }
+
+ callFTp();
