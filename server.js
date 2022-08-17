@@ -47,7 +47,12 @@ app.use(cors());
       parser.parseString(data, function (err, result) {
         //  console.dir(result);
         //  console.log("Done",'xml');
-        soldXML = result;
+         let data = result.propertyList.residential.map((i) => {
+           if (i.$.status == "sold") {
+             soldXML.push(i);
+           }
+         });
+  
       });
     });
 
