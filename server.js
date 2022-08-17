@@ -30,8 +30,11 @@ app.use(cors());
    var fs = require("fs"),
      xml2js = require("xml2js");
      let leaseXML = [];
+     let soldXML = []
 
    var parser = new xml2js.Parser();
+
+
    fs.readFile(__dirname + "/ftp/data.xml", function (err, data) {
      parser.parseString(data, function (err, result) {
       //  console.dir(result);
@@ -39,6 +42,14 @@ app.use(cors());
       leaseXML = result;
      });
    });
+
+    fs.readFile(__dirname + "/ftp/sold.xml", function (err, data) {
+      parser.parseString(data, function (err, result) {
+        //  console.dir(result);
+        //  console.log("Done",'xml');
+        soldXML = result;
+      });
+    });
 
     app.get("/sale", (req, res) => {
 
@@ -58,6 +69,10 @@ app.use(cors());
               res.send(leaseXML);
           
         });
+
+            app.get("/sold_xml", (req, res) => {
+              res.send(soldXML);
+            });
 
     app.listen(process.env.PORT || 3100, function () {
       console.log(`listening on ${3100}`);
