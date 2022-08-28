@@ -290,7 +290,7 @@ async function callFTp() {
     // await client.uploadFrom("index.html", "index.html");
     await client.downloadTo(
       "ftp/data.xml",
-      "propertyMe/inspectre_IRE-AntonZhouk_202208152212455450772.xml"
+      "propertyMe/inspectre_IRE-AntonZhouk_202208250524216100719.xml"
     );
   } catch (err) {
     console.log(err);
