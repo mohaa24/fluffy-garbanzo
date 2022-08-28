@@ -16,7 +16,10 @@ var ObjectId = require("mongodb").ObjectID;
 // MiddleWares
 // ========================
 // Make sure you place body-parser before your CRUD handlers!
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+
+
 app.set("view engine", "ejs");
 app.use(cors());
 
@@ -154,6 +157,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
       blogCollection
         .find()
         .toArray()
+        // .sort({_id:-1})
         .then((results) => {
           res.send(results);
         })
@@ -286,7 +290,7 @@ async function callFTp() {
     // await client.uploadFrom("index.html", "index.html");
     await client.downloadTo(
       "ftp/data.xml",
-      "inspectre_IRE-AntonZhouk_202208152212455450772.xml"
+      "propertyMe/inspectre_IRE-AntonZhouk_202208152212455450772.xml"
     );
   } catch (err) {
     console.log(err);
