@@ -8,10 +8,6 @@ const cors = require("cors");
 var path = require("path");
 var ObjectId = require("mongodb").ObjectID;
 
-
-
-
-
 // ========================
 // MiddleWares
 // ========================
@@ -19,75 +15,96 @@ var ObjectId = require("mongodb").ObjectID;
 // app.use(bodyParser.json());
 app.use(bodyParser.json({ limit: "50mb" }));
 
-
 app.set("view engine", "ejs");
 app.use(cors());
 
+// ========================
+// Property Routes
+// ========================
 
+const requestInspectionTime = (id = "15222874") => {
+  axios({
+    method: "get",
+    url: `https://ap-southeast-2.api.vaultre.com.au/api/v1.3/openHomes?properties=${id},0&pagesize=50`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "X-Api-Key": key,
+    },
+  })
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => console.log(error));
+};
 
-    // ========================
-    // Property Routes
-    // ========================
+//xml data
+var fs = require("fs"),
+  xml2js = require("xml2js");
+let leaseXML = [];
+let soldXML = [];
 
-      //xml data
-   var fs = require("fs"),
-     xml2js = require("xml2js");
-     let leaseXML = [];
-     let soldXML = []
+var parser = new xml2js.Parser();
 
-   var parser = new xml2js.Parser();
+fs.readFile(__dirname + "/ftp/data.xml", function (err, data) {
+  parser.parseString(data, function (err, result) {
+    //  console.dir(result);
+    //  console.log("Done",'xml');
+    leaseXML = result;
+  });
+});
 
+fs.readFile(__dirname + "/ftp/sold.xml", function (err, data) {
+  parser.parseString(data, function (err, result) {
+    //  console.dir(result);
+    //  console.log("Done",'xml');
+    let data = result.propertyList.residential.map((i) => {
+      if (i.$.status == "sold") {
+        soldXML.push(i);
+      }
+    });
+  });
+});
 
-   fs.readFile(__dirname + "/ftp/data.xml", function (err, data) {
-     parser.parseString(data, function (err, result) {
-      //  console.dir(result);
-      //  console.log("Done",'xml');
-      leaseXML = result;
+app.get("/sale", (req, res) => {
+  res.send(sale);
+});
+
+app.get("/sold", (req, res) => {
+  res.send(sold);
+});
+
+app.get("/lease", (req, res) => {
+  res.send(leaseXML);
+});
+
+app.get("/sold_xml", (req, res) => {
+  res.send({ soldXML });
+});
+
+ app.get("/inpectionTime", (req, res) => {
+
+   axios({
+     method: "get",
+     url: `https://ap-southeast-2.api.vaultre.com.au/api/v1.3/openHomes?properties=${req.query.id},0&pagesize=50`,
+     headers: {
+       Authorization: `Bearer ${token}`,
+       "X-Api-Key": key,
+     },
+   })
+     .then((response) => {
+       res.send(response.data);
+       console.log(req.query.id, "openHomes");
+     })
+     .catch((error) => {
+       console.log(error);
      });
-   });
-
-    fs.readFile(__dirname + "/ftp/sold.xml", function (err, data) {
-      parser.parseString(data, function (err, result) {
-        //  console.dir(result);
-        //  console.log("Done",'xml');
-         let data = result.propertyList.residential.map((i) => {
-           if (i.$.status == "sold") {
-             soldXML.push(i);
-           }
-         });
-  
-      });
-    });
-
-    app.get("/sale", (req, res) => {
-
-          res.send(sale);
-      
-    });
-
-    app.get("/sold", (req, res) => {
-    
-          res.send(sold);
-     
-       
-    });
-
-        app.get("/lease", (req, res) => {
-    
-              res.send(leaseXML);
-          
-        });
-
-            app.get("/sold_xml", (req, res) => {
-              res.send({soldXML});
-            });
-
-    app.listen(process.env.PORT || 3100, function () {
-      console.log(`listening on ${3100}`);
-    });
+ 
+ });
 
 
-
+app.listen(process.env.PORT || 3100, function () {
+  console.log(`listening on ${3100}`);
+});
 
 // ========================
 // Configuring DB
@@ -108,8 +125,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     // ========================
     //  Lease Routes
     // ========================
-  
-
 
     // ========================
     // Blog Routes
@@ -163,7 +178,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         })
         .catch(/* ... */);
     });
-
   })
   .catch((error) => console.error(error));
 
@@ -185,8 +199,6 @@ const leaseApi =
 let sale = [];
 let sold = [];
 let lease = [];
-
-
 
 const requestSalePropertyData = (lastUpdated = "0") => {
   axios({
@@ -240,6 +252,8 @@ const requestLeasePropertyData = (lastUpdated = "0") => {
     })
     .catch((error) => console.log(error));
 };
+
+
 requestSalePropertyData();
 requestSoldPropertyData();
 requestLeasePropertyData();
@@ -261,7 +275,7 @@ const job = nodeCron.schedule("0 10 * * * *", function jobYouNeedToExecute() {
 
   let date = new Date().toLocaleString();
   console.log(`Job ran at ${date}`);
-  console.log(sale);
+  // console.log(sale);
 
   requestSalePropertyData(date);
   requestSoldPropertyData(date);
@@ -288,7 +302,7 @@ async function callFTp() {
       password: "f6mu6a",
       secure: false,
     });
-    console.log(await client.list());
+    // console.log(await client.list());
     // await client.uploadFrom("index.html", "index.html");
     await client.downloadTo(
       "ftp/data.xml",
@@ -300,4 +314,4 @@ async function callFTp() {
   client.close();
 }
 
- callFTp();
+callFTp();
