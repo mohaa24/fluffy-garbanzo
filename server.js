@@ -22,20 +22,6 @@ app.use(cors());
 // Property Routes
 // ========================
 
-const requestInspectionTime = (id = "15222874") => {
-  axios({
-    method: "get",
-    url: `https://ap-southeast-2.api.vaultre.com.au/api/v1.3/openHomes?properties=${id},0&pagesize=50`,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "X-Api-Key": key,
-    },
-  })
-    .then((response) => {
-      return response;
-    })
-    .catch((error) => console.log(error));
-};
 
 //xml data
 var fs = require("fs"),
@@ -302,11 +288,14 @@ async function callFTp() {
       password: "f6mu6a",
       secure: false,
     });
-    // console.log(await client.list());
+    // console.log(await client.list('/propertyMe/'));
+
+    let FileArray = await client.list("/propertyMe/")
     // await client.uploadFrom("index.html", "index.html");
+    let FileName = FileArray[FileArray.length - 1].name;
     await client.downloadTo(
       "ftp/data.xml",
-      "propertyMe/inspectre_IRE-AntonZhouk_202208250524216100719.xml"
+      `propertyMe/${FileName}`
     );
   } catch (err) {
     console.log(err);
