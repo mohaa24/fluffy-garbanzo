@@ -154,6 +154,20 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         .catch(/* ... */);
     });
 
+        app.post("/updatePost", (req, res) => {
+          console.log('reciveed')
+          blogCollection
+           .replaceOne(
+             {
+             _id: ObjectID(req.query.id)
+           },
+           req.body
+           )
+            .catch(/* ... */);
+                  res.send("200");
+
+        });
+
     app.get("/posts", (req, res) => {
       blogCollection
         .find()
@@ -276,6 +290,7 @@ const job = nodeCron.schedule("0 10 * * * *", function jobYouNeedToExecute() {
 // Quick start, create an active ftp server.
 const ftp = require("basic-ftp");
 const { post } = require("request");
+const { ObjectID } = require("bson");
 // ESM: import * as ftp from "basic-ftp"
 
 async function callFTp() {
