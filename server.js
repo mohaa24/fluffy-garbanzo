@@ -67,6 +67,10 @@ app.get("/sold_xml", (req, res) => {
   res.send({ soldXML });
 });
 
+app.get("/reviews", (req, res) => {
+  res.send({ reviews });
+});
+
  app.get("/inpectionTime", (req, res) => {
 
    axios({
@@ -116,22 +120,22 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     // Blog Routes
     // ========================
 
-    let posts = [
-      {
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies. Sed commodo imperdiet metus vitae molestie. In laoreet rutrum pretium. Aenean a enim ac lacus tincidunt pellentesque ac a tellus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies.",
-        img: "https://kollosche-1bfb7.kxcdn.com/wp-content/uploads/2022/08/165777114369571257-rsd.jpeg",
-        type: "Post",
-        title: "The Best Suburb for Investors.",
-      },
-      {
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies. Sed commodo imperdiet metus vitae molestie. In laoreet rutrum pretium. Aenean a enim ac lacus tincidunt pellentesque ac a tellus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies.",
-        img: "https://kollosche-1bfb7.kxcdn.com/wp-content/uploads/2022/07/Feature-Image-scaled.jpg",
-        type: "Article",
-        title: "The Gold Coast’s Newest Million Dollar Suburbs.",
-      },
-    ];
+    // let posts = [
+    //   {
+    //     content:
+    //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies. Sed commodo imperdiet metus vitae molestie. In laoreet rutrum pretium. Aenean a enim ac lacus tincidunt pellentesque ac a tellus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies.",
+    //     img: "https://kollosche-1bfb7.kxcdn.com/wp-content/uploads/2022/08/165777114369571257-rsd.jpeg",
+    //     type: "Post",
+    //     title: "The Best Suburb for Investors.",
+    //   },
+    //   {
+    //     content:
+    //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies. Sed commodo imperdiet metus vitae molestie. In laoreet rutrum pretium. Aenean a enim ac lacus tincidunt pellentesque ac a tellus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus imperdiet ut quam sit amet vehicula. Donec sit amet facilisis quam. Integer mollis, urna accumsan tempor hendrerit, risus neque tincidunt neque, in aliquam elit eros quis tortor. Sed id venenatis massa, ut malesuada sem. Nam lacinia sodales tellus nec efficitur. Vestibulum fringilla nisl ac iaculis ultricies.",
+    //     img: "https://kollosche-1bfb7.kxcdn.com/wp-content/uploads/2022/07/Feature-Image-scaled.jpg",
+    //     type: "Article",
+    //     title: "The Gold Coast’s Newest Million Dollar Suburbs.",
+    //   },
+    // ];
 
     app.post("/addPost", (req, res) => {
       blogCollection.insertOne(req.body);
@@ -179,7 +183,9 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         .catch(/* ... */);
     });
   })
-  .catch((error) => console.error(error));
+
+  
+  // .catch((error) => console.error(error));
 
 // ========================
 // Valtre API schedule
@@ -199,6 +205,8 @@ const leaseApi =
 let sale = [];
 let sold = [];
 let lease = [];
+let reviews;
+
 
 const requestSalePropertyData = (lastUpdated = "0") => {
   axios({
@@ -218,6 +226,26 @@ const requestSalePropertyData = (lastUpdated = "0") => {
     })
     .catch((error) => console.log(error));
 };
+
+const requestReviews=()=>{
+  var config = {
+    method: "get",
+    url: "https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJWaSVaiRD1moRq7kIpy_WiYQ&fields&fields=name%2Crating%2Cformatted_phone_number&key=AIzaSyCTOE_MsQbccUCzP30zTME94o-vTI6-IaA",
+    headers: {},
+  };
+
+  axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data), "reviews");
+      reviews = response.data;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
+requestReviews()
+
 const requestSoldPropertyData = (lastUpdated = "0") => {
   axios({
     method: "get",
@@ -280,6 +308,7 @@ const job = nodeCron.schedule("0 10 * * * *", function jobYouNeedToExecute() {
   requestSalePropertyData(date);
   requestSoldPropertyData(date);
   requestLeasePropertyData(date);
+  requestReviews();
   callFTp();
 });
 
