@@ -194,7 +194,8 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
 const token = "ozyttvptsnkpbvjfhogsvrtojytbptqeljwbyhyp";
 const key = "wljszq3Wsj8omYXJk6Aek9BdMQCE8ecF7aGmK9hI";
 const saleApi =
-  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale?publishedOnPortals=35646&sort=inserted&pagesize=5000&sortOrder=desc";
+  // "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale?publishedOnPortals=35646&sort=inserted&pagesize=5000&sortOrder=desc";
+  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale?&publishedOnPortals=35646&sortOrder=desc&status=listing";
 const soldApi =
   // "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?sort=unconditional&sortOrder=desc";
   "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?pagesize=50&sort=unconditional&sortOrder=desc&unconditionalSince=2020-06-24";
