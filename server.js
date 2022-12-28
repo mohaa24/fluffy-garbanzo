@@ -198,8 +198,9 @@ const saleApi =
   "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale?publishedOnPortals=35646&sort=inserted&sortOrder=desc";
 //&status=listingOrConditional";
 const soldApi =
+    "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?pagesize=50&sort=unconditional&sortOrder=desc&unconditionalSince=2021-06-24";
   // "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?sort=unconditional&sortOrder=desc";
-  "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?pagesize=50&sort=unconditional&sortOrder=desc&unconditionalSince=2020-06-24";
+ // "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/sale/sold?pagesize=50&sort=unconditional&sortOrder=desc&unconditionalSince=2020-06-24";
 
 const leaseApi =
   "https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/residential/lease?sort=modified&sortOrder=desc";
