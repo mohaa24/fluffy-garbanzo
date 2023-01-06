@@ -67,6 +67,11 @@ app.get("/sold_xml", (req, res) => {
   res.send({ soldXML });
 });
 
+// run ftp
+app.get("/ftp", (req, res) => {
+  ftp();
+});
+
 app.get("/reviews", (req, res) => {
   res.send({ reviews });
 });
@@ -107,9 +112,9 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
   .then((client) => {
     console.log("Connected to Database");
     const db = client.db("A--Z");
-    const saleCollection = db.collection("sale");
-    const buyCollection = db.collection("buy");
-    const leaseCollection = db.collection("lease");
+    // const saleCollection = db.collection("sale");
+    // const buyCollection = db.collection("buy");
+    // const leaseCollection = db.collection("lease");
     const blogCollection = db.collection("blog");
 
     // ========================
@@ -340,7 +345,7 @@ async function callFTp() {
     let FileArray = await client.list("/propertyMe/")
     // await client.uploadFrom("index.html", "index.html");
     let FileName = FileArray[FileArray.length - 1].name;
-    await client.downloadTo(
+     await client.downloadTo(
       "ftp/data.xml",
       `propertyMe/${FileName}`
     );
